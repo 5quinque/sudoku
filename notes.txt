@@ -1,0 +1,9 @@
+
+https://en.wikipedia.org/wiki/Backtracking
+http://norvig.com/sudoku.html
+https://en.wikipedia.org/wiki/Sudoku_solving_algorithms
+
+
+
+
+
