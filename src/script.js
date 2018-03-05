@@ -21,10 +21,29 @@ class Sudoku {
   drawGame() {
     // check difficulty
     // create new puzzle
-    let puzzle = this.getPuzzle();
+    const puzzle = this.getPuzzle();
+
+    this.drawGrid();
 
     // add to DOM
     this.drawPuzzle(puzzle);
+  }
+
+  /**
+   * 
+   * @description Add the divs to our grid
+   * @returns {undefined}
+   */
+  drawGrid() {
+    const el = document.querySelector(".ninexnine_wrapper");
+
+    // Rows
+    for (let i = 1; i <= 9; i++) {
+      // Columns
+      for (let j = 1; j <= 9; j++) {
+        el.innerHTML += "<div class=\"row"+i+" col"+j+"\"></div>";
+      }
+    }
   }
 
   drawPuzzle(puzzle) {
@@ -34,7 +53,7 @@ class Sudoku {
       col = i % 9;
       row = Math.floor(i / 9);
 
-      let el = document.querySelector(".col"+(col+1)+".row"+(row+1));
+      const el = document.querySelector(".col"+(col+1)+".row"+(row+1));
       if (puzzle[i]) {
         el.innerHTML = "<input type=\"text\" value=\""+puzzle[i]+"\" disabled>";
         el.classList.add("default");
@@ -45,7 +64,7 @@ class Sudoku {
   }
 
   getPuzzle() {
-    let p = [
+    const p = [
       5, 3, 0, 0, 7, 0, 0, 0, 0,
       6, 0 ,0, 1, 9, 5, 0, 0, 0,
       0, 9, 8, 0, 0, 0, 0, 6, 0,
@@ -93,7 +112,7 @@ class Sudoku {
     let values = [];
     let classes;
     let isGood = true;
-    let matches = document.querySelectorAll("."+rc+x);
+    const matches = document.querySelectorAll("."+rc+x);
 
     for (let el of matches) {
       // Skip empty boxes
@@ -142,6 +161,24 @@ class Sudoku {
 
   /**
    * 
+   * @description Get the starting row of a given square
+   * @returns int y
+   */
+  getStartingRow(i) {
+    let y;
+    if (i < 4) {
+      y = 1;
+    } else if (i < 7) {
+      y = 4;
+    } else {
+      y = 7;
+    }
+    return y;
+  }
+ 
+
+  /**
+   * 
    *
    * @returns {undefined}
    */
@@ -175,7 +212,7 @@ class Sudoku {
  
     for (let i = x; i < x+3; i++) {
       for (let j = y; j < y+3; j++) {
-        let el = document.querySelector(".col"+i+".row"+j);
+        const el = document.querySelector(".col"+i+".row"+j);
         //console.log(".col"+i+".row"+j);
         //console.log("X: ",i, "Y: ", j);
         //console.log(".col"+i+".row"+j, el.childNodes[0].value);
@@ -209,21 +246,22 @@ class Sudoku {
   }
 
   getPossibleValues(x, y) {
+    // [TODO] finish this
     console.log(x, y);
-    let el = document.querySelector("."+y+"."+x);
-    let value = el.childNodes[0].value;
+    const el = document.querySelector("."+y+"."+x);
+    const value = el.childNodes[0].value;
 
     console.log(value);
   }
 
-  getSquareIndexFromClassList(classList) {
+  getSquareIndex(classList) {
     // this.parentElement.classList.value
-    let row = /row(\d)/.exec(classList);
-    let col = /col(\d)/.exec(classList);
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
     
-    let tempCol = Math.ceil(col[1] / 3);
-    let tempRow = (Math.ceil(row[1] / 3) - 1) * 3;
-    let square = tempRow + tempCol;
+    const tempCol = Math.ceil(col[1] / 3);
+    const tempRow = (Math.ceil(row[1] / 3) - 1) * 3;
+    const square = tempRow + tempCol;
 
     return square;
   }

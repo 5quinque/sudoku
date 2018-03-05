@@ -15,15 +15,17 @@ class Error {
     let memy = {};
     let memsq = {};
 
-    let row = /row(\d)/.exec(classList);
-    let col = /col(\d)/.exec(classList);
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
 
     if (!this.isRowValid("."+row[0]))
       isValid = false;
     if (!this.isRowValid("."+col[0]))
       isValid = false;
 
-    // [TODO] Check is square is valid
+    const square = this.sudoku.getSquareIndex(classList);
+    if (!this.isSquareValid(square))
+      isValid = false
  
     return isValid;
   }
@@ -35,8 +37,8 @@ class Error {
    */
   isRowValid(elClass) {
     let isValid = true;
-    let matches = document.querySelectorAll(elClass);
     let values = [];
+    const matches = document.querySelectorAll(elClass);
 
     for (let el of matches) {
       if (!el.childNodes[0].value)
@@ -51,13 +53,37 @@ class Error {
     return isValid;
   }
 
+  isSquareValid(i) {
+    let x, y;
+    let isValid = true;
+    let values = [];
+
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
+    // Get starting row
+    y = this.sudoku.getStartingRow(i);
+ 
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        if (!el.childNodes[0].value)
+          continue;
+        if (values.includes(el.childNodes[0].value)) {
+          isValid = false;
+          break;
+        }
+        values.push(el.childNodes[0].value);
+      }
+    }
+    return isValid;
+  }
+
   /**
    * 
    * @description Remove 'error' class from valid boxes on given line
    * @returns {undefined}
    */
   clearLine(rc, x, val) {
-    let matches = document.querySelectorAll("."+rc+x);
+    const matches = document.querySelectorAll("."+rc+x);
 
     for (let el of matches) {
       if (el.childNodes[0].value == val) {
@@ -80,29 +106,22 @@ class Error {
   clearSquare(i, val) {
     let x, y;
 
-    // Get starting col
-    this.sudoku.getStartingCol(i);
+    console.log("Clearing square");
 
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
     // Get starting row
-    if (i < 4) {
-      y = 1;
-    } else if (i < 7) {
-      y = 4;
-    } else {
-      y = 7;
-    }
- 
+    y = this.sudoku.getStartingRow(i);
+
     for (let i = x; i < x+3; i++) {
       for (let j = y; j < y+3; j++) {
         let el = document.querySelector(".col"+i+".row"+j);
-        if (el.childNodes[0].value == val) {
+        if (el.childNodes[0].value == val &&
+            this.isValidStar(el.classList))
           el.classList.remove("error");
-        }
       }
     }
   }
-
-
 
   /**
    * [UNUSED]
@@ -110,7 +129,7 @@ class Error {
    * @returns {undefined}
    */
   highlightLine(rc, x) {
-    let matches = document.querySelectorAll("."+rc+x);
+    const matches = document.querySelectorAll("."+rc+x);
 
     for (let el of matches) {
       if (!el.classList.contains("error"))
@@ -124,11 +143,10 @@ class Error {
    * @returns {undefined}
    */
   clearErrors() {
-    let tiles = document.querySelectorAll(".ninexnine_wrapper > *");
+    const tiles = document.querySelectorAll(".ninexnine_wrapper > *");
 
-    for (let el of tiles) {
+    for (let el of tiles)
       el.classList.remove("error");
-    }
   }
 
 }

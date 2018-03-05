@@ -2,14 +2,14 @@
 
 class Input {
   constructor(sudoku) {
-    let self = this;
     this.sudoku = sudoku;
 
     this.addInputListeners(); 
   }
 
   addInputListeners() {
-    let inputs = document.querySelectorAll(".ninexnine_wrapper > div > input");
+    const self = this;
+    const inputs = document.querySelectorAll(".ninexnine_wrapper > div > input");
     
     // Loop through all inputs adding event listeners
     for (let i = 0; i < inputs.length; i++) {
@@ -25,20 +25,20 @@ class Input {
   }
 
   checkValid(el) {
-    let key = el.parentElement.classList[0] + el.parentElement.classList[1];
+    const key = el.parentElement.classList[0] + el.parentElement.classList[1];
     console.log("New", el.value);
   
     this.sudoku.test = {};
   
     let error = false;
   
-    let row = /row(\d)/.exec(el.parentElement.classList.value);
-    let col = /col(\d)/.exec(el.parentElement.classList.value);
+    const row = /row(\d)/.exec(el.parentElement.classList.value);
+    const col = /col(\d)/.exec(el.parentElement.classList.value);
   
     if (!this.sudoku.checkLine("row", row[1])) error = true;
     if (!this.sudoku.checkLine("col", col[1])) error = true;
     
-    let square = this.sudoku.getSquareIndexFromClassList(el.parentElement.classList.value);
+    const square = this.sudoku.getSquareIndex(el.parentElement.classList.value);
     if (!this.sudoku.checkSquare(square)) error = true;
   
     if (error) {
@@ -68,7 +68,7 @@ class Input {
    * @returns {undefined}
    */
   storeBoxValue(el) {
-    let key = el.parentElement.classList[0] + el.parentElement.classList[1];
+    const key = el.parentElement.classList[0] + el.parentElement.classList[1];
 
     if (el.value) {
       console.log("Current", el.value);
