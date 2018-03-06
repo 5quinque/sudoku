@@ -18,14 +18,20 @@ class Error {
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
 
-    if (!this.isRowValid("."+row[0]))
+    if (!this.isRowValid("."+row[0])) {
+      //console.log("Row is invalid");
       isValid = false;
-    if (!this.isRowValid("."+col[0]))
+    }
+    if (!this.isRowValid("."+col[0])) {
+      //console.log("Col is invalid");
       isValid = false;
+    }
 
     const square = this.sudoku.getSquareIndex(classList);
-    if (!this.isSquareValid(square))
+    if (!this.isSquareValid(square)) {
+      //console.log("Square is invalid");
       isValid = false
+    }
  
     return isValid;
   }
@@ -65,6 +71,7 @@ class Error {
  
     for (let i = x; i < x+3; i++) {
       for (let j = y; j < y+3; j++) {
+        let el = document.querySelector(".col"+i+".row"+j);
         if (!el.childNodes[0].value)
           continue;
         if (values.includes(el.childNodes[0].value)) {

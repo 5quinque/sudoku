@@ -22,8 +22,15 @@ class Input {
         self.storeBoxValue(this);
       });
     }
+
+    // Add event listeners for buttons
+    let solveEl = document.getElementsByClassName("btn-solve")[0];
+    solveEl.addEventListener("click", function() {
+      self.sudoku.solver.test();
+    });
   }
 
+  // [TODO] Split this up a bit
   checkValid(el) {
     const key = el.parentElement.classList[0] + el.parentElement.classList[1];
     console.log("New", el.value);
