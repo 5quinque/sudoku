@@ -145,7 +145,7 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
 
 .button_grp {
   display: grid;
-  grid-template-columns: [col] auto [col] auto [col] auto;
+  grid-template-columns: [col] auto [col] auto;
   grid-template-rows: [row] auto [row] auto [row] ;
   margin: auto;
   width: 368px;
@@ -154,7 +154,7 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
   border-radius: 0 0 4px 4px;
 }
 
-.btn-check, .btn-clear, .btn-new {
+.btn-check, .btn-clear, .btn-new, .btn-solve {
   display: block;
   margin: 10px 0;
   padding: 10px;
@@ -177,3 +177,14 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
   text-align: center;
 }
 
+
+
+/*
+ *
+
+ .one{
+   background-image: -webkit-linear-gradient(45deg, #013A6B 50%, #004E95 50%);
+     height: 50px;
+       width: 50px;
+       }
+       */

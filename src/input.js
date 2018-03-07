@@ -26,7 +26,7 @@ class Input {
     // Add event listeners for buttons
     let solveEl = document.getElementsByClassName("btn-solve")[0];
     solveEl.addEventListener("click", function() {
-      self.sudoku.solver.test();
+      self.sudoku.solver.solve();
     });
   }
 
