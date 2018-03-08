@@ -1,6 +1,6 @@
 
 body {
-  background-color: #ffda79;
+  background-color: #F8EFBA;
   font-family: sans-serif;
 }
 
@@ -9,7 +9,7 @@ body {
   grid-gap: 1px;
   grid-template-columns: repeat(9, 40px);
   grid-template-rows: repeat(9, 40px);
-  background-color: #aaa69d;
+  background-color: #D6A2E8;
   padding: 10px;
   border-radius: 4px 4px 0 0;
   width: 368px;
@@ -146,37 +146,44 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
 .button_grp {
   display: grid;
   grid-template-columns: [col] auto [col] auto;
-  grid-template-rows: [row] auto [row] auto [row] ;
+  grid-template-rows: [row] auto;
+  grid-gap: 5px;
   margin: auto;
   width: 368px;
-  background-color: #aaa69d;
+  background-color: #D6A2E8;
   padding: 0 10px 10px;
   border-radius: 0 0 4px 4px;
 }
 
-.btn-check, .btn-clear, .btn-new, .btn-solve {
+.btn-new, .btn-solve {
   display: block;
-  margin: 10px 0;
+  margin: 0px 0;
   padding: 10px;
   width: 100%;
-}
+  
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #D6A2E8;
+  background-color: #82589F;
+  box-shadow: 0;
+  border: 0;
+  border-radius: 3px;
 
-.item-a {
-  grid-column: col / span 1;
+  cursor: pointer;
+}
+.btn-new:hover, .btn-solve:hover {
+  background-color: #2C3A47;
+}
+.item {
   grid-row: row;
   text-align: center;
+}
+.item-a {
+  grid-column: col / span 1;
 }
 .item-b {
   grid-column: col 2 / span 1;
-  grid-row: row;
-  text-align: center;
 }
-.item-c {
-  grid-column: col 3 / span 1;
-  grid-row: row;
-  text-align: center;
-}
-
 
 
 /*

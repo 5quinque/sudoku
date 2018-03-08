@@ -20,6 +20,10 @@ class Solver {
         console.log("Too many loops, exiting");
         break;
       }
+      if (i < 0) {
+        console.log("Not solvable?");
+        return false;
+      }
 
       //?
       if (!(i in this.boxes))
@@ -74,6 +78,10 @@ class Solver {
       boxEl.childNodes[0].value = 1;
     }
 
+    // When making array backtrack
+    // /maybe/ insteadof ++ store array of values treied for each index
+    // and randomly use one of them
+    // will prob help with creating puzzle and finding unique solution
     while (!this.sudoku.error.isValidStar(boxEl.classList) &&
        boxEl.childNodes[0].value < 9) {
       boxEl.childNodes[0].value++;

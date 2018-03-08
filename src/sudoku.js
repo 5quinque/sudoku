@@ -1,6 +1,7 @@
 'use strict';
 
 import Error from './errorCheck.js'
+import ErrorArray from './errorCheckArray.js'
 import Input from './input.js'
 import Solver from './solver.js'
 
@@ -64,30 +65,80 @@ class Sudoku {
     }
   }
 
-  newPuzzle() {
+  async newPuzzle() {
     const puzzleWrapper = document.querySelector(".ninexnine_wrapper");
     const puzzle = this.createPuzzle();
 
     puzzleWrapper.innerHTML = "";
     this.drawGrid();
 
-    this.drawPuzzle(puzzle);
-  }
+    this.backSolvePuzzle(puzzle);
+
+    //this.drawPuzzle(puzzle);
+
+   }
 
   createPuzzle() {
-    const p = [
-      5, 3, 0, 0, 7, 0, 0, 0, 0,
-      6, 0 ,0, 1, 9, 5, 0, 0, 0,
-      0, 9, 8, 0, 0, 0, 0, 6, 0,
-      8, 0, 0, 0, 6, 0, 0, 0, 3,
-      4, 0, 0, 8, 0, 3, 0, 0, 1,
-      7, 0, 0, 0, 2, 0, 0, 0, 6,
-      0, 6, 0, 0, 0, 0, 2, 8, 0,
-      0, 0, 0, 4, 1, 9, 0, 0, 5,
-      0, 0, 0, 0, 8, 0, 0, 7, 9
+    let p = [
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0
     ];
 
+    p[0] = this.getRandomInt(p);
+    p[1] = this.getRandomInt(p);
+    p[2] = this.getRandomInt(p);
+
+    p[9] = this.getRandomInt(p);
+    p[10] = this.getRandomInt(p);
+    p[11] = this.getRandomInt(p);
+
+    p[18] = this.getRandomInt(p);
+    p[19] = this.getRandomInt(p);
+    p[20] = this.getRandomInt(p);
+
+    p[30] = this.getRandomInt(p.slice(30,50));
+    p[31] = this.getRandomInt(p.slice(30,50));
+    p[32] = this.getRandomInt(p.slice(30,50));
+
+    p[39] = this.getRandomInt(p.slice(30,50));
+    p[40] = this.getRandomInt(p.slice(30,50));
+    p[41] = this.getRandomInt(p.slice(30,50));
+
+    p[48] = this.getRandomInt(p.slice(30,50));
+    p[49] = this.getRandomInt(p.slice(30,50));
+    p[50] = this.getRandomInt(p.slice(30,50));
+
+
+
+    p[60] = this.getRandomInt(p.slice(60,80));
+    p[61] = this.getRandomInt(p.slice(60,80));
+    p[62] = this.getRandomInt(p.slice(60,80));
+
+    p[69] = this.getRandomInt(p.slice(60,80));
+    p[70] = this.getRandomInt(p.slice(60,80));
+    p[71] = this.getRandomInt(p.slice(60,80));
+
+    p[78] = this.getRandomInt(p.slice(60,80));
+    p[79] = this.getRandomInt(p.slice(60,80));
+    p[80] = this.getRandomInt(p.slice(60,80));
+
+
     return p;
+  }
+
+  getRandomInt(p) {
+      let i;
+      do
+        i = Math.floor(Math.random() * 9) + 1;
+      while (p.indexOf(i) != -1)
+      return i;
   }
 
   getPuzzle() {
@@ -342,7 +393,6 @@ class Sudoku {
   }
 
   getSquareIndex(classList) {
-    // this.parentElement.classList.value
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
     

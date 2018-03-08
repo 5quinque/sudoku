@@ -297,6 +297,232 @@ class Error {
 
 /***/ }),
 
+/***/ "./src/errorCheckArray.js":
+/*!********************************!*\
+  !*** ./src/errorCheckArray.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+
+class ErrorArray {
+  constructor(sudoku) {
+    this.sudoku = sudoku;
+  }
+
+  /**
+   * 
+   * @description Check row, col and 3x3 square for given tile
+   * @returns {undefined}
+   */
+  isValidStar(tilePos) {
+    let isValid = true;
+
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
+    const square = this.sudoku.getSquareIndex(classList);
+
+    if (!this.isRowValid("."+row[0]) ||
+        !this.isRowValid("."+col[0]) ||
+        !this.isSquareValid(square))
+      isValid = false;
+ 
+    return isValid;
+  }
+
+  /**
+   * 
+   * @description Check if a row is valid for given tile class
+   * @returns {undefined}
+   */
+  isRowValid(elClass) {
+    let isValid = true;
+    let values = [];
+    const matches = document.querySelectorAll(elClass);
+
+    for (let el of matches) {
+      if (!el.childNodes[0].value)
+        continue;
+      if (values.includes(el.childNodes[0].value)) {
+        isValid = false;
+        break;
+      }
+      values.push(el.childNodes[0].value);
+    }
+
+    return isValid;
+  }
+
+  isSquareValid(i) {
+    let x, y;
+    let isValid = true;
+    let values = [];
+
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
+    // Get starting row
+    y = this.sudoku.getStartingRow(i);
+ 
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        let el = document.querySelector(".col"+i+".row"+j);
+        if (!el.childNodes[0].value)
+          continue;
+        if (values.includes(el.childNodes[0].value)) {
+          isValid = false;
+          break;
+        }
+        values.push(el.childNodes[0].value);
+      }
+    }
+    return isValid;
+  }
+
+  isBoxProbemSquare(i, value) {
+    let x, y;
+    let isProblem = false;
+    let values = [];
+
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
+    // Get starting row
+    y = this.sudoku.getStartingRow(i);
+ 
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        let el = document.querySelector(".col"+i+".row"+j);
+        if (!el.childNodes[0].value)
+          continue;
+        if (values.includes(el.childNodes[0].value)) {
+          if (el.childNodes[0].value == value) {
+            isProblem = true;
+            break;
+          }
+        }
+        values.push(el.childNodes[0].value);
+      }
+    }
+    return isProblem;
+  }
+
+
+  isBoxProblemRow(elClass, value) {
+    let isProblem = false;
+    let values = [];
+    const matches = document.querySelectorAll(elClass);
+
+    for (let el of matches) {
+      if (!el.childNodes[0].value)
+        continue;
+      if (values.includes(el.childNodes[0].value)) {
+        if (el.childNodes[0].value == value) {
+          isProblem = true;
+          break;
+        }
+      }
+      values.push(el.childNodes[0].value);
+    }
+
+    return isProblem;
+  }
+
+
+  /**
+   * 
+   * @description Is the given box an incorrect invalid
+   * @returns {undefined}
+   */
+  isBoxProblem(classList, value) {
+    let isProblem = false;
+
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
+    const square = this.sudoku.getSquareIndex(classList);
+
+    if (this.isBoxProblemRow("."+row[0], value) ||
+        this.isBoxProblemRow("."+col[0], value) ||
+        this.isBoxProbemSquare(square, value))
+      isProblem = true;
+ 
+    return isProblem;
+  }
+  
+  applyErrorClass(element) {
+   if (this.isBoxProblem(element.classList, element.childNodes[0].value)) {
+     element.classList.add("error");
+   } else {
+     element.classList.remove("error");
+   }
+  }
+
+  /**
+   * 
+   * @description Remove 'error' class from valid boxes on given line
+   * @returns {undefined}
+   */
+  clearLine(rc, x, val) {
+    const matches = document.querySelectorAll("."+rc+x);
+
+    for (let el of matches) {
+      if (el.childNodes[0].value == val) {
+        // Check if removal is valid..
+        if (this.isValidStar(el.classList)) {
+          el.classList.remove("error");
+          //console.log("Valid square, removing error class", el.classList);
+        } else {
+          console.log("Still an error, not removing error class", el.classList);
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @description Remove 'error' calss from valid boxes on given square
+   * @returns {undefined}
+   */
+  clearSquare(i, val) {
+    let x, y;
+
+    console.log("Clearing square");
+
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
+    // Get starting row
+    y = this.sudoku.getStartingRow(i);
+
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        let el = document.querySelector(".col"+i+".row"+j);
+        if (el.childNodes[0].value == val &&
+            this.isValidStar(el.classList))
+          el.classList.remove("error");
+      }
+    }
+  }
+
+  /**
+   * [UNUSED]
+   * @description Remove 'error' class from all divs in the grid
+   * @returns {undefined}
+   */
+  clearErrors() {
+    const tiles = document.querySelectorAll(".ninexnine_wrapper > *");
+
+    for (let el of tiles)
+      el.classList.remove("error");
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ErrorArray);
+
+
+/***/ }),
+
 /***/ "./src/input.js":
 /*!**********************!*\
   !*** ./src/input.js ***!
@@ -343,6 +569,7 @@ class Input {
     });
   }
 
+  //
   checkValid(el) {
     let tempRow, tempCol;
     let tempEl, rowEl, colEl;
@@ -442,6 +669,10 @@ class Solver {
         console.log("Too many loops, exiting");
         break;
       }
+      if (i < 0) {
+        console.log("Not solvable?");
+        return false;
+      }
 
       //?
       if (!(i in this.boxes))
@@ -496,6 +727,10 @@ class Solver {
       boxEl.childNodes[0].value = 1;
     }
 
+    // When making array backtrack
+    // /maybe/ insteadof ++ store array of values treied for each index
+    // and randomly use one of them
+    // will prob help with creating puzzle and finding unique solution
     while (!this.sudoku.error.isValidStar(boxEl.classList) &&
        boxEl.childNodes[0].value < 9) {
       boxEl.childNodes[0].value++;
@@ -539,8 +774,10 @@ class Solver {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _errorCheck_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./errorCheck.js */ "./src/errorCheck.js");
-/* harmony import */ var _input_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./input.js */ "./src/input.js");
-/* harmony import */ var _solver_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./solver.js */ "./src/solver.js");
+/* harmony import */ var _errorCheckArray_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./errorCheckArray.js */ "./src/errorCheckArray.js");
+/* harmony import */ var _input_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./input.js */ "./src/input.js");
+/* harmony import */ var _solver_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./solver.js */ "./src/solver.js");
+
 
 
 
@@ -558,8 +795,8 @@ class Sudoku {
     this.drawGame();
 
     this.error = new _errorCheck_js__WEBPACK_IMPORTED_MODULE_0__["default"](this);
-    this.solver = new _solver_js__WEBPACK_IMPORTED_MODULE_2__["default"](this);
-    this.input = new _input_js__WEBPACK_IMPORTED_MODULE_1__["default"](this);
+    this.solver = new _solver_js__WEBPACK_IMPORTED_MODULE_3__["default"](this);
+    this.input = new _input_js__WEBPACK_IMPORTED_MODULE_2__["default"](this);
   }
 
   drawGame() {
@@ -607,30 +844,80 @@ class Sudoku {
     }
   }
 
-  newPuzzle() {
+  async newPuzzle() {
     const puzzleWrapper = document.querySelector(".ninexnine_wrapper");
     const puzzle = this.createPuzzle();
 
     puzzleWrapper.innerHTML = "";
     this.drawGrid();
 
-    this.drawPuzzle(puzzle);
-  }
+    this.backSolvePuzzle(puzzle);
+
+    //this.drawPuzzle(puzzle);
+
+   }
 
   createPuzzle() {
-    const p = [
-      5, 3, 0, 0, 7, 0, 0, 0, 0,
-      6, 0 ,0, 1, 9, 5, 0, 0, 0,
-      0, 9, 8, 0, 0, 0, 0, 6, 0,
-      8, 0, 0, 0, 6, 0, 0, 0, 3,
-      4, 0, 0, 8, 0, 3, 0, 0, 1,
-      7, 0, 0, 0, 2, 0, 0, 0, 6,
-      0, 6, 0, 0, 0, 0, 2, 8, 0,
-      0, 0, 0, 4, 1, 9, 0, 0, 5,
-      0, 0, 0, 0, 8, 0, 0, 7, 9
+    let p = [
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0
     ];
 
+    p[0] = this.getRandomInt(p);
+    p[1] = this.getRandomInt(p);
+    p[2] = this.getRandomInt(p);
+
+    p[9] = this.getRandomInt(p);
+    p[10] = this.getRandomInt(p);
+    p[11] = this.getRandomInt(p);
+
+    p[18] = this.getRandomInt(p);
+    p[19] = this.getRandomInt(p);
+    p[20] = this.getRandomInt(p);
+
+    p[30] = this.getRandomInt(p.slice(30,50));
+    p[31] = this.getRandomInt(p.slice(30,50));
+    p[32] = this.getRandomInt(p.slice(30,50));
+
+    p[39] = this.getRandomInt(p.slice(30,50));
+    p[40] = this.getRandomInt(p.slice(30,50));
+    p[41] = this.getRandomInt(p.slice(30,50));
+
+    p[48] = this.getRandomInt(p.slice(30,50));
+    p[49] = this.getRandomInt(p.slice(30,50));
+    p[50] = this.getRandomInt(p.slice(30,50));
+
+
+
+    p[60] = this.getRandomInt(p.slice(60,80));
+    p[61] = this.getRandomInt(p.slice(60,80));
+    p[62] = this.getRandomInt(p.slice(60,80));
+
+    p[69] = this.getRandomInt(p.slice(60,80));
+    p[70] = this.getRandomInt(p.slice(60,80));
+    p[71] = this.getRandomInt(p.slice(60,80));
+
+    p[78] = this.getRandomInt(p.slice(60,80));
+    p[79] = this.getRandomInt(p.slice(60,80));
+    p[80] = this.getRandomInt(p.slice(60,80));
+
+
     return p;
+  }
+
+  getRandomInt(p) {
+      let i;
+      do
+        i = Math.floor(Math.random() * 9) + 1;
+      while (p.indexOf(i) != -1)
+      return i;
   }
 
   getPuzzle() {
@@ -885,7 +1172,6 @@ class Sudoku {
   }
 
   getSquareIndex(classList) {
-    // this.parentElement.classList.value
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
     

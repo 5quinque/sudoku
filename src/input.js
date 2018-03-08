@@ -35,6 +35,7 @@ class Input {
     });
   }
 
+  //
   checkValid(el) {
     let tempRow, tempCol;
     let tempEl, rowEl, colEl;
