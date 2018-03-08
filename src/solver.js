@@ -11,13 +11,19 @@ class Solver {
     let loops = 0;
     this.boxes = document.querySelector(".ninexnine_wrapper").childNodes;
 
-    //for (let i = 2; i < 27; i++) {
-    for (let i = 2; i < 81; i++) {
+    // Clear any user inputted values
+    this.clearAhead(0);
+
+    for (let i = 1; i < 82; i++) {
       loops++;
-      if (loops > 45000) {
+      if (loops > 985000) {
         console.log("Too many loops, exiting");
         break;
       }
+
+      //?
+      if (!(i in this.boxes))
+        continue;
 
       // Skip over 'default' boxes
       if (this.boxes[i].classList.contains("default") && !this.moveForward) {
@@ -27,12 +33,11 @@ class Solver {
         continue;
       }
 
-      //await this.func2(i);
-      this.moveForward = this.elSol(this.boxes[i]);
+      await this.func2(i);
+      //this.moveForward = this.elSol(this.boxes[i]);
 
       if (!this.moveForward) {
         
-        //
         // Move back two spaces
         //console.log(`Loop: ${loops} - i: ${i} - moving to ${i - 2}`);
         i -= 2;
@@ -50,7 +55,7 @@ class Solver {
       self.moveForward = self.elSol(self.boxes[i]);
 
      resolve();
-    }, 10));
+    }, 1));
   }
 
   elSol(boxEl, x) {

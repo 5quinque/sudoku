@@ -4,6 +4,7 @@ class Error {
   constructor(sudoku) {
     this.sudoku = sudoku;
   }
+
   /**
    * 
    * @description Check row, col and 3x3 square for given tile
@@ -11,27 +12,15 @@ class Error {
    */
   isValidStar(classList) {
     let isValid = true;
-    let memx = {};
-    let memy = {};
-    let memsq = {};
 
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
-
-    if (!this.isRowValid("."+row[0])) {
-      //console.log("Row is invalid");
-      isValid = false;
-    }
-    if (!this.isRowValid("."+col[0])) {
-      //console.log("Col is invalid");
-      isValid = false;
-    }
-
     const square = this.sudoku.getSquareIndex(classList);
-    if (!this.isSquareValid(square)) {
-      //console.log("Square is invalid");
-      isValid = false
-    }
+
+    if (!this.isRowValid("."+row[0]) ||
+        !this.isRowValid("."+col[0]) ||
+        !this.isSquareValid(square))
+      isValid = false;
  
     return isValid;
   }
@@ -84,6 +73,83 @@ class Error {
     return isValid;
   }
 
+  isBoxProbemSquare(i, value) {
+    let x, y;
+    let isProblem = false;
+    let values = [];
+
+    // Get starting col
+    x = this.sudoku.getStartingCol(i);
+    // Get starting row
+    y = this.sudoku.getStartingRow(i);
+ 
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        let el = document.querySelector(".col"+i+".row"+j);
+        if (!el.childNodes[0].value)
+          continue;
+        if (values.includes(el.childNodes[0].value)) {
+          if (el.childNodes[0].value == value) {
+            isProblem = true;
+            break;
+          }
+        }
+        values.push(el.childNodes[0].value);
+      }
+    }
+    return isProblem;
+  }
+
+
+  isBoxProblemRow(elClass, value) {
+    let isProblem = false;
+    let values = [];
+    const matches = document.querySelectorAll(elClass);
+
+    for (let el of matches) {
+      if (!el.childNodes[0].value)
+        continue;
+      if (values.includes(el.childNodes[0].value)) {
+        if (el.childNodes[0].value == value) {
+          isProblem = true;
+          break;
+        }
+      }
+      values.push(el.childNodes[0].value);
+    }
+
+    return isProblem;
+  }
+
+
+  /**
+   * 
+   * @description Is the given box an incorrect invalid
+   * @returns {undefined}
+   */
+  isBoxProblem(classList, value) {
+    let isProblem = false;
+
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
+    const square = this.sudoku.getSquareIndex(classList);
+
+    if (this.isBoxProblemRow("."+row[0], value) ||
+        this.isBoxProblemRow("."+col[0], value) ||
+        this.isBoxProbemSquare(square, value))
+      isProblem = true;
+ 
+    return isProblem;
+  }
+  
+  applyErrorClass(element) {
+   if (this.isBoxProblem(element.classList, element.childNodes[0].value)) {
+     element.classList.add("error");
+   } else {
+     element.classList.remove("error");
+   }
+  }
+
   /**
    * 
    * @description Remove 'error' class from valid boxes on given line
@@ -106,7 +172,7 @@ class Error {
   }
 
   /**
-   * [TODO] Make this the same as clearLine
+   *
    * @description Remove 'error' calss from valid boxes on given square
    * @returns {undefined}
    */
@@ -127,20 +193,6 @@ class Error {
             this.isValidStar(el.classList))
           el.classList.remove("error");
       }
-    }
-  }
-
-  /**
-   * [UNUSED]
-   * @description Highlights a given line 
-   * @returns {undefined}
-   */
-  highlightLine(rc, x) {
-    const matches = document.querySelectorAll("."+rc+x);
-
-    for (let el of matches) {
-      if (!el.classList.contains("error"))
-        el.classList.add("error");
     }
   }
 

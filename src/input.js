@@ -28,45 +28,39 @@ class Input {
     solveEl.addEventListener("click", function() {
       self.sudoku.solver.solve();
     });
+
+    let newEl = document.getElementsByClassName("btn-new")[0];
+    newEl.addEventListener("click", function() {
+      self.sudoku.newPuzzle();
+    });
   }
 
-  // [TODO] Split this up a bit
   checkValid(el) {
-    const key = el.parentElement.classList[0] + el.parentElement.classList[1];
-    console.log("New", el.value);
-  
-    this.sudoku.test = {};
-  
-    let error = false;
-  
-    const row = /row(\d)/.exec(el.parentElement.classList.value);
-    const col = /col(\d)/.exec(el.parentElement.classList.value);
-  
-    if (!this.sudoku.checkLine("row", row[1])) error = true;
-    if (!this.sudoku.checkLine("col", col[1])) error = true;
-    
+    let tempRow, tempCol;
+    let tempEl, rowEl, colEl;
     const square = this.sudoku.getSquareIndex(el.parentElement.classList.value);
-    if (!this.sudoku.checkSquare(square)) error = true;
-  
-    if (error) {
-      if (!el.parentElement.classList.contains("error"))
-        el.parentElement.classList.add("error");
+
+    // Check rows/cols if valid and apply/remove .error classes
+    const row = /row(\d)/.exec(el.parentElement.classList);
+    const col = /col(\d)/.exec(el.parentElement.classList);
+    for (let i = 1; i <= 9; i++) {
+      rowEl = document.getElementsByClassName(`${row[0]} col${i}`)[0];
+      colEl = document.getElementsByClassName(`row${i} ${col[0]}`)[0];
+      this.sudoku.error.applyErrorClass(rowEl);
+      this.sudoku.error.applyErrorClass(colEl);
     }
-  
-    if (el.value != this.sudoku.currentValues[key] && this.sudoku.currentValues[key]) {
-      console.log("Clear all neighbouring errors with value", this.sudoku.currentValues[key]);
-      this.sudoku.error.clearLine("row", row[1], this.sudoku.currentValues[key]);
-      this.sudoku.error.clearLine("col", col[1], this.sudoku.currentValues[key]);
-  
-      this.sudoku.error.clearSquare(square, this.sudoku.currentValues[key]);
+
+    // Check if square is valid and apply/remove .error classes
+    const x = this.sudoku.getStartingCol(square);
+    const y = this.sudoku.getStartingRow(square);
+    for (let i = x; i < x+3; i++) {
+      for (let j = y; j < y+3; j++) {
+        tempEl = document.getElementsByClassName(`row${j} col${i}`)[0];
+        this.sudoku.error.applyErrorClass(tempEl);
+      }
     }
-  
-    this.sudoku.currentValues[key] = el.value;
-  
-    if (!el.value) {
-      el.parentElement.classList.remove("error");
-    }
-  
+
+    return true;
   }
   
   /**
@@ -78,7 +72,6 @@ class Input {
     const key = el.parentElement.classList[0] + el.parentElement.classList[1];
 
     if (el.value) {
-      console.log("Current", el.value);
       this.sudoku.currentValues[key] = el.value;
     }
   }
