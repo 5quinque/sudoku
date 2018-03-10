@@ -1,7 +1,7 @@
 // @format
 
 // prettier-ignore
-const p = [
+const startingPuzzle = [
   7, 1, 0, 0, 0, 9, 0, 0, 6,
   0, 5, 0, 0, 0, 0, 2, 7, 0,
   0, 0, 2, 0, 7, 3, 0, 0, 1,
@@ -13,32 +13,117 @@ const p = [
   2, 0, 7, 1, 8, 0, 0, 0, 0,
 ];
 
-const i = 7;
+let tempPuzzle = startingPuzzle;
 
-const row = Math.floor(i / 9) + 1;
-const col = i % 9 + 1;
+let movingForward = true;
 
-const rowResult = p.filter(isRow);
-const colResult = p.filter(isCol);
+let loops = 0;
 
-const tempCol = Math.ceil(col / 3);
-const tempRow = (Math.ceil(row / 3) - 1) * 3;
-const square = tempRow + tempCol;
+for (let i = 0; i < startingPuzzle.length; i++) {
+  loops++;
+  if (loops > 14000) {
+    console.log('Too many loops');
+    break;
+  }
+  // Skip default tiles
+  if (
+    tempPuzzle[i] !== 0 &&
+    tempPuzzle[i] === startingPuzzle[i] &&
+    !movingForward
+  ) {
+    i -= 2;
+    tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
+  }
+  if (tempPuzzle[i] !== 0 && tempPuzzle[i] === startingPuzzle[i]) continue;
 
-const squareResult = getSquare(square, p);
+  // Increment our current tile
+  //isStarValid(i, tempPuzzle);
+  movingForward = incrementTile(tempPuzzle, i);
 
-if (hasDuplicateValue(rowResult)) console.log('Row has duplicate value');
-
-if (hasDuplicateValue(colResult)) console.log('Col has duplicate value');
-
-if (hasDuplicateValue(squareResult)) console.log('Square has duplicate value');
-
-function isRow(value, index) {
-  return Math.floor(index / 9) + 1 == row;
+  //
+  if (!movingForward) {
+    // Move back two spaces
+    i -= 2;
+    tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
+  }
 }
 
-function isCol(value, index) {
-  return index % 9 + 1 == col;
+let line;
+for (let i = 0; i < tempPuzzle.length; i++) {
+  if (i % 9 == 0) {
+    console.log(`${line}\n`);
+    line = '';
+  }
+
+  line += `${tempPuzzle[i]} `;
+}
+
+function incrementTile(tempPuzzle, i) {
+  tempPuzzle[i]++;
+
+  if (tempPuzzle[i] > 9) {
+    tempPuzzle[i] = 0;
+    return false;
+  }
+
+  while (!isStarValid(i, tempPuzzle) && tempPuzzle[i] < 9) tempPuzzle[i]++;
+
+  if (!isStarValid(i, tempPuzzle)) {
+    tempPuzzle[i] = 0;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function clearAhead(element, index) {
+  const startingPuzzle = this[0];
+  const greaterThan = this[1];
+
+  if (index < greaterThan || startingPuzzle[index] !== 0) return element;
+
+  return 0;
+}
+
+function isStarValid(i, tempPuzzle) {
+  // Get the row and column index
+  const rowIndex = Math.floor(i / 9) + 1;
+  const colIndex = i % 9 + 1;
+  // Using the above values, calculate the square index
+  const colO3 = Math.ceil(colIndex / 3);
+  const rowT3 = (Math.ceil(rowIndex / 3) - 1) * 3;
+  const squareIndex = rowT3 + colO3;
+
+  // Filter the row, column and 3x3 square from our puzzle array
+  let rowValues = tempPuzzle.filter(isRow, rowIndex);
+  let colValues = tempPuzzle.filter(isCol, colIndex);
+  let squareValues = getSquare(squareIndex, tempPuzzle);
+
+  // Remove all '0's
+  rowValues = rowValues.filter(removeZero);
+  colValues = colValues.filter(removeZero);
+  squareValues = squareValues.filter(removeZero);
+
+  // Check if we have any duplicates
+  if (
+    hasDuplicateValue(rowValues) ||
+    hasDuplicateValue(colValues) ||
+    hasDuplicateValue(squareValues)
+  )
+    return false;
+  return true;
+}
+
+function removeZero(element) {
+  return element !== 0;
+}
+
+function isRow(element, index) {
+  return Math.floor(index / 9) + 1 == this;
+}
+
+function isCol(element, index) {
+  return index % 9 + 1 == this;
 }
 
 function getSquare(i, puzzleArray) {
@@ -88,6 +173,6 @@ function getStartingRow(i) {
 function hasDuplicateValue(unit) {
   unit.sort();
   for (let i = 0; i < unit.length; i++)
-    if (unit[i] === unit[i + 1]) return false;
-  return true;
+    if (unit[i] === unit[i + 1]) return true;
+  return false;
 }
