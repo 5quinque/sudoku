@@ -1,61 +1,51 @@
 // @format
 
-// prettier-ignore
-const startingPuzzle = [
-  7, 1, 0, 0, 0, 9, 0, 0, 6,
-  0, 5, 0, 0, 0, 0, 2, 7, 0,
-  0, 0, 2, 0, 7, 3, 0, 0, 1,
-  0, 0, 0, 0, 2, 0, 1, 9, 0,
-  0, 0, 9, 4, 0, 0, 7, 0, 3,
-  4, 7, 0, 0, 0, 1, 6, 0, 0,
-  0, 3, 0, 6, 0, 0, 0, 1, 0,
-  6, 0, 0, 0, 0, 0, 0, 8, 2,
-  2, 0, 7, 1, 8, 0, 0, 0, 0,
-];
+let startingPuzzle, tempPuzzle;
 
-let tempPuzzle = startingPuzzle;
-
-let movingForward = true;
-
-let loops = 0;
-
-for (let i = 0; i < startingPuzzle.length; i++) {
-  loops++;
-  if (loops > 14000) {
-    console.log('Too many loops');
-    break;
-  }
-  // Skip default tiles
-  if (
-    tempPuzzle[i] !== 0 &&
-    tempPuzzle[i] === startingPuzzle[i] &&
-    !movingForward
-  ) {
-    i -= 2;
-    tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
-  }
-  if (tempPuzzle[i] !== 0 && tempPuzzle[i] === startingPuzzle[i]) continue;
-
-  // Increment our current tile
-  //isStarValid(i, tempPuzzle);
-  movingForward = incrementTile(tempPuzzle, i);
-
-  //
-  if (!movingForward) {
-    // Move back two spaces
-    i -= 2;
-    tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
-  }
+while (!tempPuzzle) {
+  startingPuzzle = createPuzzleTemplate();
+  tempPuzzle = startingPuzzle.slice(0);
+  tempPuzzle = solvePuzzle(tempPuzzle, startingPuzzle);
 }
 
-let line;
-for (let i = 0; i < tempPuzzle.length; i++) {
-  if (i % 9 == 0) {
-    console.log(`${line}\n`);
-    line = '';
-  }
+consoleLogPuzzle(startingPuzzle);
+consoleLogPuzzle(tempPuzzle);
 
-  line += `${tempPuzzle[i]} `;
+function solvePuzzle(tempPuzzle, startingPuzzle) {
+  let movingForward = true;
+  let loops = 0;
+  for (let i = 0; i < startingPuzzle.length; i++) {
+    if (loops++ > 300) return false;
+
+    // Skip default tiles
+    if (startingPuzzle[i] != 0 && !movingForward) {
+      i -= 2;
+      tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
+      continue;
+    }
+    if (startingPuzzle[i] != 0) continue;
+
+    movingForward = incrementTile(tempPuzzle, i);
+
+    if (!movingForward) {
+      // Move back two spaces
+      i -= 2;
+      tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
+    }
+  }
+  return tempPuzzle;
+}
+
+function consoleLogPuzzle(tempPuzzle) {
+  let line = '';
+  for (let i = 0; i < tempPuzzle.length + 1; i++) {
+    if (i % 9 == 0) {
+      console.log(`${line}`);
+      line = '';
+    }
+
+    line += `${tempPuzzle[i]} `;
+  }
 }
 
 function incrementTile(tempPuzzle, i) {
@@ -71,18 +61,48 @@ function incrementTile(tempPuzzle, i) {
   if (!isStarValid(i, tempPuzzle)) {
     tempPuzzle[i] = 0;
     return false;
-  } else {
-    return true;
   }
+
+  return true;
+}
+
+function createPuzzleTemplate() {
+  let p = [];
+  // Create array full of '0's
+  for (let i = 0; i < 81; i++) p[i] = 0;
+
+  // Fill our the first 3x3 box (First row, first column)
+  [0, 1, 2, 9, 10, 11, 18, 19, 20].forEach(function(i) {
+    p[i] = getRandomInt(p);
+  });
+
+  // Fill the second 3x3 box (Second row, second column)
+  [30, 31, 32, 39, 40, 41, 48, 49, 50].forEach(function(i) {
+    p[i] = getRandomInt(p.slice(30, 50));
+  });
+
+  // Fill our final 3x3 box (Third row, third column)
+  [60, 61, 62, 69, 70, 71, 78, 79, 80].forEach(function(i) {
+    p[i] = getRandomInt(p.slice(60, 80));
+  });
+
+  return p;
+}
+
+function getRandomInt(p) {
+  let i;
+  do i = Math.floor(Math.random() * 9) + 1;
+  while (p.indexOf(i) != -1);
+  return i;
 }
 
 function clearAhead(element, index) {
   const startingPuzzle = this[0];
   const greaterThan = this[1];
 
-  if (index < greaterThan || startingPuzzle[index] !== 0) return element;
+  if (index < greaterThan) return element;
 
-  return 0;
+  return startingPuzzle[index];
 }
 
 function isStarValid(i, tempPuzzle) {
