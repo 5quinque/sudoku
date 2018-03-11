@@ -15,7 +15,7 @@ class Solver {
     // Clear any user inputted values
     this.clearAhead(0);
 
-    for (let i = 1; i < 82; i++) {
+    for (let i = 1; i < 81; i++) {
       loops++;
       if (loops > 985000) {
         console.log('Too many loops, exiting');
@@ -25,9 +25,6 @@ class Solver {
         console.log('Not solvable?');
         return false;
       }
-
-      //?
-      if (!(i in this.boxes)) continue;
 
       // Skip over 'default' boxes
       if (this.boxes[i].classList.contains('default') && !this.moveForward) {

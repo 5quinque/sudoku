@@ -105,6 +105,7 @@ class Engine {
 
     while (!uniquePuzzle) {
       finalPuzzle = this.generateNewPuzzle();
+      uniquePuzzle = true;
     }
 
     this.consoleLogPuzzle(solvedPuzzle);
@@ -256,7 +257,7 @@ class Engine {
     // Filter the row, column and 3x3 square from our puzzle array
     let rowValues = tempPuzzle.filter(this.isRow, rowIndex);
     let colValues = tempPuzzle.filter(this.isCol, colIndex);
-    let squareValues = this.getSquare(this.squareIndex, tempPuzzle);
+    let squareValues = this.getSquare(squareIndex, tempPuzzle);
 
     // Remove all '0's
     rowValues = rowValues.filter(this.removeZero);
@@ -588,6 +589,7 @@ class Input {
     const inputs = document.querySelectorAll(
       '.ninexnine_wrapper > div > input',
     );
+    let buttonRunning = false;
 
     // Loop through all inputs adding event listeners
     for (let i = 0; i < inputs.length; i++) {
@@ -604,12 +606,20 @@ class Input {
     // Add event listeners for buttons
     let solveEl = document.getElementsByClassName('btn-solve')[0];
     solveEl.addEventListener('click', function() {
-      self.sudoku.solver.solve();
+      if (!buttonRunning) {
+        buttonRunning = true;
+        self.sudoku.solver.solve();
+        buttonRunning = false;
+      }
     });
 
     let newEl = document.getElementsByClassName('btn-new')[0];
     newEl.addEventListener('click', function() {
-      self.sudoku.newPuzzle();
+      if (!buttonRunning) {
+        buttonRunning = true;
+        self.sudoku.newPuzzle();
+        buttonRunning = false;
+      }
     });
   }
 
@@ -707,7 +717,7 @@ class Solver {
     // Clear any user inputted values
     this.clearAhead(0);
 
-    for (let i = 1; i < 82; i++) {
+    for (let i = 1; i < 81; i++) {
       loops++;
       if (loops > 985000) {
         console.log('Too many loops, exiting');
@@ -717,9 +727,6 @@ class Solver {
         console.log('Not solvable?');
         return false;
       }
-
-      //?
-      if (!(i in this.boxes)) continue;
 
       // Skip over 'default' boxes
       if (this.boxes[i].classList.contains('default') && !this.moveForward) {
@@ -891,14 +898,9 @@ class Sudoku {
 
   async newPuzzle() {
     const puzzleWrapper = document.querySelector('.ninexnine_wrapper');
-    const puzzle = this.createPuzzle();
-
     puzzleWrapper.innerHTML = '';
-    this.drawGrid();
 
-    this.backSolvePuzzle(puzzle);
-
-    //this.drawPuzzle(puzzle);
+    this.drawGame();
   }
 
   createPuzzle() {

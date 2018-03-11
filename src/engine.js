@@ -23,6 +23,7 @@ class Engine {
 
     while (!uniquePuzzle) {
       finalPuzzle = this.generateNewPuzzle();
+      uniquePuzzle = true;
     }
 
     this.consoleLogPuzzle(solvedPuzzle);
@@ -174,7 +175,7 @@ class Engine {
     // Filter the row, column and 3x3 square from our puzzle array
     let rowValues = tempPuzzle.filter(this.isRow, rowIndex);
     let colValues = tempPuzzle.filter(this.isCol, colIndex);
-    let squareValues = this.getSquare(this.squareIndex, tempPuzzle);
+    let squareValues = this.getSquare(squareIndex, tempPuzzle);
 
     // Remove all '0's
     rowValues = rowValues.filter(this.removeZero);

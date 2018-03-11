@@ -70,14 +70,9 @@ class Sudoku {
 
   async newPuzzle() {
     const puzzleWrapper = document.querySelector('.ninexnine_wrapper');
-    const puzzle = this.createPuzzle();
-
     puzzleWrapper.innerHTML = '';
-    this.drawGrid();
 
-    this.backSolvePuzzle(puzzle);
-
-    //this.drawPuzzle(puzzle);
+    this.drawGame();
   }
 
   createPuzzle() {

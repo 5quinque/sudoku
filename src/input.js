@@ -13,6 +13,7 @@ class Input {
     const inputs = document.querySelectorAll(
       '.ninexnine_wrapper > div > input',
     );
+    let buttonRunning = false;
 
     // Loop through all inputs adding event listeners
     for (let i = 0; i < inputs.length; i++) {
@@ -29,12 +30,20 @@ class Input {
     // Add event listeners for buttons
     let solveEl = document.getElementsByClassName('btn-solve')[0];
     solveEl.addEventListener('click', function() {
-      self.sudoku.solver.solve();
+      if (!buttonRunning) {
+        buttonRunning = true;
+        self.sudoku.solver.solve();
+        buttonRunning = false;
+      }
     });
 
     let newEl = document.getElementsByClassName('btn-new')[0];
     newEl.addEventListener('click', function() {
-      self.sudoku.newPuzzle();
+      if (!buttonRunning) {
+        buttonRunning = true;
+        self.sudoku.newPuzzle();
+        buttonRunning = false;
+      }
     });
   }
 
