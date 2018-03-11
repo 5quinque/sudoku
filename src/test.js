@@ -1,21 +1,65 @@
 // @format
 
-let startingPuzzle, tempPuzzle;
+let startingPuzzle, solvedPuzzle, finalPuzzle;
+let removeIndex;
 
-while (!tempPuzzle) {
+while (!solvedPuzzle) {
   startingPuzzle = createPuzzleTemplate();
-  tempPuzzle = startingPuzzle.slice(0);
-  tempPuzzle = solvePuzzle(tempPuzzle, startingPuzzle);
+  solvedPuzzle = solvePuzzle(startingPuzzle);
+}
+finalPuzzle = solvedPuzzle.slice(0);
+
+//consoleLogPuzzle(startingPuzzle);
+consoleLogPuzzle(solvedPuzzle);
+
+// remove 2, solve
+// remove 1, solve
+// remove 1, solve
+
+do removeIndex = Math.floor(Math.random() * 80);
+while (finalPuzzle[removeIndex] == 0);
+finalPuzzle[removeIndex] = 0;
+
+do removeIndex = Math.floor(Math.random() * 80);
+while (finalPuzzle[removeIndex] == 0);
+finalPuzzle[removeIndex] = 0;
+
+consoleLogPuzzle(finalPuzzle);
+
+x = solvePuzzle(finalPuzzle);
+
+consoleLogPuzzle(x);
+
+//if (JSON.stringify(x) == JSON.stringify(solvedPuzzle)) {
+if (compareArrays(x, solvedPuzzle)) {
+  console.log('Both the same :) ');
+} else {
+  console.log('Not the same..');
 }
 
-consoleLogPuzzle(startingPuzzle);
-consoleLogPuzzle(tempPuzzle);
+function compareArrays(x, y) {
+  for (let i = 0; i < x.length; i++) {
+    if (x[i] !== y[i]) {
+      console.log(`i: ${i}, x:${x[i]} y: ${y[i]}`);
+      return false;
+    }
+  }
+  return true;
+}
 
-function solvePuzzle(tempPuzzle, startingPuzzle) {
+//console.log('Hi');
+//tempPuzzle = startingPuzzle.slice(0);
+//tempPuzzle = solvePuzzle(tempPuzzle, startingPuzzle);
+//consoleLogPuzzle(tempPuzzle);
+
+function solvePuzzle(startingPuzzle) {
   let movingForward = true;
   let loops = 0;
+  let validMoves = createValidMoves();
+  let tempPuzzle = startingPuzzle.slice(0);
+
   for (let i = 0; i < startingPuzzle.length; i++) {
-    if (loops++ > 300) return false;
+    if (loops++ > 250) return false;
 
     // Skip default tiles
     if (startingPuzzle[i] != 0 && !movingForward) {
@@ -25,7 +69,7 @@ function solvePuzzle(tempPuzzle, startingPuzzle) {
     }
     if (startingPuzzle[i] != 0) continue;
 
-    movingForward = incrementTile(tempPuzzle, i);
+    movingForward = incrementTile(tempPuzzle, i, validMoves);
 
     if (!movingForward) {
       // Move back two spaces
@@ -33,7 +77,14 @@ function solvePuzzle(tempPuzzle, startingPuzzle) {
       tempPuzzle = tempPuzzle.map(clearAhead, [startingPuzzle, i + 2]);
     }
   }
+
   return tempPuzzle;
+}
+
+function createValidMoves() {
+  let validMoves = {};
+  for (let i = 0; i < 81; i++) validMoves[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  return validMoves;
 }
 
 function consoleLogPuzzle(tempPuzzle) {
@@ -48,18 +99,19 @@ function consoleLogPuzzle(tempPuzzle) {
   }
 }
 
-function incrementTile(tempPuzzle, i) {
-  tempPuzzle[i]++;
+function incrementTile(tempPuzzle, i, validMoves) {
+  let validIndex;
 
-  if (tempPuzzle[i] > 9) {
-    tempPuzzle[i] = 0;
-    return false;
-  }
+  do {
+    validIndex = Math.floor(Math.random() * validMoves[i].length);
+    tempPuzzle[i] = validMoves[i][validIndex];
+    validMoves[i].splice(validIndex, 1);
+  } while (!isStarValid(i, tempPuzzle) && validMoves[i].length > 0);
 
-  while (!isStarValid(i, tempPuzzle) && tempPuzzle[i] < 9) tempPuzzle[i]++;
-
+  // If we have exhausted the valid moves and we're still not valid
   if (!isStarValid(i, tempPuzzle)) {
     tempPuzzle[i] = 0;
+    validMoves[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     return false;
   }
 
