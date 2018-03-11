@@ -71,6 +71,277 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/engine.js":
+/*!***********************!*\
+  !*** ./src/engine.js ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// @format
+
+
+
+// It's called engine, because it drives it all
+class Engine {
+  constructor(sudoku) {
+    this.sudoku = sudoku;
+  }
+
+  generateNewPuzzle() {
+    let startingPuzzle, solvedPuzzle, finalPuzzle;
+    let uniquePuzzle = false;
+
+    while (!solvedPuzzle) {
+      startingPuzzle = this.createPuzzleTemplate();
+      solvedPuzzle = this.solvePuzzle(startingPuzzle);
+    }
+
+    finalPuzzle = solvedPuzzle.slice(0);
+
+    uniquePuzzle = this.shrinkPuzzle(finalPuzzle, solvedPuzzle);
+
+    while (!uniquePuzzle) {
+      finalPuzzle = this.generateNewPuzzle();
+    }
+
+    this.consoleLogPuzzle(solvedPuzzle);
+    return finalPuzzle;
+  }
+
+  shrinkPuzzle(finalPuzzle, solvedPuzzle) {
+    let tempSolved;
+    for (let i = 0; i < 45; i++) {
+      this.removeTile(finalPuzzle);
+    }
+
+    tempSolved = this.solvePuzzle(finalPuzzle);
+
+    return this.compareArrays(tempSolved, solvedPuzzle);
+  }
+
+  compareArrays(x, y) {
+    for (let i = 0; i < x.length; i++) {
+      if (x[i] !== y[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  removeTile(finalPuzzle) {
+    let removeIndex;
+    do removeIndex = Math.floor(Math.random() * 80);
+    while (finalPuzzle[removeIndex] == 0);
+    finalPuzzle[removeIndex] = 0;
+  }
+
+  solvePuzzle(startingPuzzle) {
+    let movingForward = true;
+    let loops = 0;
+    let validMoves = this.createValidMoves();
+    let tempPuzzle = startingPuzzle.slice(0);
+
+    for (let i = 0; i < startingPuzzle.length; i++) {
+      if (loops++ > 250) return false;
+
+      // Skip default tiles
+      if (startingPuzzle[i] != 0 && !movingForward) {
+        i -= 2;
+        tempPuzzle = tempPuzzle.map(this.clearAhead, [startingPuzzle, i + 2]);
+        continue;
+      }
+      if (startingPuzzle[i] != 0) continue;
+
+      movingForward = this.incrementTile(tempPuzzle, i, validMoves);
+
+      if (!movingForward) {
+        // Move back two spaces
+        i -= 2;
+        tempPuzzle = tempPuzzle.map(this.clearAhead, [startingPuzzle, i + 2]);
+      }
+    }
+
+    return tempPuzzle;
+  }
+
+  createValidMoves() {
+    let validMoves = {};
+    for (let i = 0; i < 81; i++) validMoves[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    return validMoves;
+  }
+
+  consoleLogPuzzle(tempPuzzle) {
+    let line = '';
+    for (let i = 0; i < tempPuzzle.length + 1; i++) {
+      if (i % 9 == 0) {
+        console.log(`${line}`);
+        line = '';
+      }
+
+      line += `${tempPuzzle[i]} `;
+    }
+  }
+
+  incrementTile(tempPuzzle, i, validMoves) {
+    let validIndex;
+
+    do {
+      validIndex = Math.floor(Math.random() * validMoves[i].length);
+      tempPuzzle[i] = validMoves[i][validIndex];
+      validMoves[i].splice(validIndex, 1);
+    } while (!this.isStarValid(i, tempPuzzle) && validMoves[i].length > 0);
+
+    // If we have exhausted the valid moves and we're still not valid
+    if (!this.isStarValid(i, tempPuzzle)) {
+      tempPuzzle[i] = 0;
+      validMoves[i] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      return false;
+    }
+
+    return true;
+  }
+
+  createPuzzleTemplate() {
+    let p = [];
+    const self = this;
+    // Create array full of '0's
+    for (let i = 0; i < 81; i++) p[i] = 0;
+
+    // Fill our the first 3x3 box (First row, first column)
+    [0, 1, 2, 9, 10, 11, 18, 19, 20].forEach(function(i) {
+      p[i] = self.getRandomInt(p);
+    });
+
+    // Fill the second 3x3 box (Second row, second column)
+    [30, 31, 32, 39, 40, 41, 48, 49, 50].forEach(function(i) {
+      p[i] = self.getRandomInt(p.slice(30, 50));
+    });
+
+    // Fill our final 3x3 box (Third row, third column)
+    [60, 61, 62, 69, 70, 71, 78, 79, 80].forEach(function(i) {
+      p[i] = self.getRandomInt(p.slice(60, 80));
+    });
+
+    return p;
+  }
+
+  getRandomInt(p) {
+    let i;
+    do i = Math.floor(Math.random() * 9) + 1;
+    while (p.indexOf(i) != -1);
+    return i;
+  }
+
+  clearAhead(element, index) {
+    const startingPuzzle = this[0];
+    const greaterThan = this[1];
+
+    if (index < greaterThan) return element;
+
+    return startingPuzzle[index];
+  }
+
+  isStarValid(i, tempPuzzle) {
+    // Get the row and column index
+    const rowIndex = Math.floor(i / 9) + 1;
+    const colIndex = i % 9 + 1;
+    // Using the above values, calculate the square index
+    const colO3 = Math.ceil(colIndex / 3);
+    const rowT3 = (Math.ceil(rowIndex / 3) - 1) * 3;
+    const squareIndex = rowT3 + colO3;
+
+    // Filter the row, column and 3x3 square from our puzzle array
+    let rowValues = tempPuzzle.filter(this.isRow, rowIndex);
+    let colValues = tempPuzzle.filter(this.isCol, colIndex);
+    let squareValues = this.getSquare(this.squareIndex, tempPuzzle);
+
+    // Remove all '0's
+    rowValues = rowValues.filter(this.removeZero);
+    colValues = colValues.filter(this.removeZero);
+    squareValues = squareValues.filter(this.removeZero);
+
+    // Check if we have any duplicates
+    if (
+      this.hasDuplicateValue(rowValues) ||
+      this.hasDuplicateValue(colValues) ||
+      this.hasDuplicateValue(squareValues)
+    )
+      return false;
+    return true;
+  }
+
+  removeZero(element) {
+    return element !== 0;
+  }
+
+  isRow(element, index) {
+    return Math.floor(index / 9) + 1 == this;
+  }
+
+  isCol(element, index) {
+    return index % 9 + 1 == this;
+  }
+
+  getSquare(i, puzzleArray) {
+    const x = this.getStartingCol(i);
+    const y = this.getStartingRow(i);
+    let index;
+    let squareArray = [];
+
+    for (let i = x; i < x + 3; i++) {
+      for (let j = y; j < y + 3; j++) {
+        index = j * 9 + i;
+        squareArray.push(puzzleArray[index]);
+      }
+    }
+
+    return squareArray;
+  }
+
+  getStartingCol(i) {
+    let x;
+    switch (i % 3) {
+      case 1:
+        x = 0;
+        break;
+      case 2:
+        x = 3;
+        break;
+      case 0:
+        x = 6;
+        break;
+    }
+    return x;
+  }
+
+  getStartingRow(i) {
+    let y;
+    if (i < 4) {
+      y = 0;
+    } else if (i < 7) {
+      y = 3;
+    } else {
+      y = 6;
+    }
+    return y;
+  }
+
+  hasDuplicateValue(unit) {
+    unit.sort();
+    for (let i = 0; i < unit.length; i++)
+      if (unit[i] === unit[i + 1]) return true;
+    return false;
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Engine);
+
+
+/***/ }),
+
 /***/ "./src/errorCheck.js":
 /*!***************************!*\
   !*** ./src/errorCheck.js ***!
@@ -289,228 +560,6 @@ class Error {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Error);
-
-
-/***/ }),
-
-/***/ "./src/errorCheckArray.js":
-/*!********************************!*\
-  !*** ./src/errorCheckArray.js ***!
-  \********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// @format
-
-
-class ErrorArray {
-  constructor(sudoku) {
-    this.sudoku = sudoku;
-  }
-
-  /**
-   *
-   * @description Check row, col and 3x3 square for given tile
-   * @returns {undefined}
-   */
-  isValidStar(tilePos) {
-    let isValid = true;
-
-    const row = /row(\d)/.exec(classList);
-    const col = /col(\d)/.exec(classList);
-    const square = this.sudoku.getSquareIndex(classList);
-
-    if (
-      !this.isRowValid('.' + row[0]) ||
-      !this.isRowValid('.' + col[0]) ||
-      !this.isSquareValid(square)
-    )
-      isValid = false;
-
-    return isValid;
-  }
-
-  /**
-   *
-   * @description Check if a row is valid for given tile class
-   * @returns {undefined}
-   */
-  isRowValid(elClass) {
-    let isValid = true;
-    let values = [];
-    const matches = document.querySelectorAll(elClass);
-
-    for (let el of matches) {
-      if (!el.childNodes[0].value) continue;
-      if (values.includes(el.childNodes[0].value)) {
-        isValid = false;
-        break;
-      }
-      values.push(el.childNodes[0].value);
-    }
-
-    return isValid;
-  }
-
-  isSquareValid(i) {
-    let x, y;
-    let isValid = true;
-    let values = [];
-
-    // Get starting col
-    x = this.sudoku.getStartingCol(i);
-    // Get starting row
-    y = this.sudoku.getStartingRow(i);
-
-    for (let i = x; i < x + 3; i++) {
-      for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
-        if (!el.childNodes[0].value) continue;
-        if (values.includes(el.childNodes[0].value)) {
-          isValid = false;
-          break;
-        }
-        values.push(el.childNodes[0].value);
-      }
-    }
-    return isValid;
-  }
-
-  isBoxProbemSquare(i, value) {
-    let x, y;
-    let isProblem = false;
-    let values = [];
-
-    // Get starting col
-    x = this.sudoku.getStartingCol(i);
-    // Get starting row
-    y = this.sudoku.getStartingRow(i);
-
-    for (let i = x; i < x + 3; i++) {
-      for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
-        if (!el.childNodes[0].value) continue;
-        if (values.includes(el.childNodes[0].value)) {
-          if (el.childNodes[0].value == value) {
-            isProblem = true;
-            break;
-          }
-        }
-        values.push(el.childNodes[0].value);
-      }
-    }
-    return isProblem;
-  }
-
-  isBoxProblemRow(elClass, value) {
-    let isProblem = false;
-    let values = [];
-    const matches = document.querySelectorAll(elClass);
-
-    for (let el of matches) {
-      if (!el.childNodes[0].value) continue;
-      if (values.includes(el.childNodes[0].value)) {
-        if (el.childNodes[0].value == value) {
-          isProblem = true;
-          break;
-        }
-      }
-      values.push(el.childNodes[0].value);
-    }
-
-    return isProblem;
-  }
-
-  /**
-   *
-   * @description Is the given box an incorrect invalid
-   * @returns {undefined}
-   */
-  isBoxProblem(classList, value) {
-    let isProblem = false;
-
-    const row = /row(\d)/.exec(classList);
-    const col = /col(\d)/.exec(classList);
-    const square = this.sudoku.getSquareIndex(classList);
-
-    if (
-      this.isBoxProblemRow('.' + row[0], value) ||
-      this.isBoxProblemRow('.' + col[0], value) ||
-      this.isBoxProbemSquare(square, value)
-    )
-      isProblem = true;
-
-    return isProblem;
-  }
-
-  applyErrorClass(element) {
-    if (this.isBoxProblem(element.classList, element.childNodes[0].value)) {
-      element.classList.add('error');
-    } else {
-      element.classList.remove('error');
-    }
-  }
-
-  /**
-   *
-   * @description Remove 'error' class from valid boxes on given line
-   * @returns {undefined}
-   */
-  clearLine(rc, x, val) {
-    const matches = document.querySelectorAll('.' + rc + x);
-
-    for (let el of matches) {
-      if (el.childNodes[0].value == val) {
-        // Check if removal is valid..
-        if (this.isValidStar(el.classList)) {
-          el.classList.remove('error');
-          //console.log("Valid square, removing error class", el.classList);
-        } else {
-          console.log('Still an error, not removing error class', el.classList);
-        }
-      }
-    }
-  }
-
-  /**
-   *
-   * @description Remove 'error' calss from valid boxes on given square
-   * @returns {undefined}
-   */
-  clearSquare(i, val) {
-    let x, y;
-
-    console.log('Clearing square');
-
-    // Get starting col
-    x = this.sudoku.getStartingCol(i);
-    // Get starting row
-    y = this.sudoku.getStartingRow(i);
-
-    for (let i = x; i < x + 3; i++) {
-      for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
-        if (el.childNodes[0].value == val && this.isValidStar(el.classList))
-          el.classList.remove('error');
-      }
-    }
-  }
-
-  /**
-   * [UNUSED]
-   * @description Remove 'error' class from all divs in the grid
-   * @returns {undefined}
-   */
-  clearErrors() {
-    const tiles = document.querySelectorAll('.ninexnine_wrapper > *');
-
-    for (let el of tiles) el.classList.remove('error');
-  }
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (ErrorArray);
 
 
 /***/ }),
@@ -767,7 +816,7 @@ class Solver {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _errorCheck_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./errorCheck.js */ "./src/errorCheck.js");
-/* harmony import */ var _errorCheckArray_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./errorCheckArray.js */ "./src/errorCheckArray.js");
+/* harmony import */ var _engine_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./engine.js */ "./src/engine.js");
 /* harmony import */ var _input_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./input.js */ "./src/input.js");
 /* harmony import */ var _solver_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./solver.js */ "./src/solver.js");
 // @format
@@ -786,17 +835,16 @@ class Sudoku {
 
     this.currentValues = {};
 
-    this.drawGame();
-
+    this.engine = new _engine_js__WEBPACK_IMPORTED_MODULE_1__["default"](this);
     this.error = new _errorCheck_js__WEBPACK_IMPORTED_MODULE_0__["default"](this);
     this.solver = new _solver_js__WEBPACK_IMPORTED_MODULE_3__["default"](this);
     this.input = new _input_js__WEBPACK_IMPORTED_MODULE_2__["default"](this);
+
+    this.drawGame();
   }
 
   drawGame() {
-    // check difficulty
-    // create new puzzle
-    const puzzle = this.getPuzzle();
+    const puzzle = this.engine.generateNewPuzzle();
 
     this.drawGrid();
 
@@ -904,79 +952,18 @@ class Sudoku {
   }
 
   getPuzzle() {
-    //const p = [
-    //  5, 3, 0, 0, 7, 0, 0, 0, 0,
-    //  6, 0 ,0, 1, 9, 5, 0, 0, 0,
-    //  0, 9, 8, 0, 0, 0, 0, 6, 0,
-    //  8, 0, 0, 0, 6, 0, 0, 0, 3,
-    //  4, 0, 0, 8, 0, 3, 0, 0, 1,
-    //  7, 0, 0, 0, 2, 0, 0, 0, 6,
-    //  0, 6, 0, 0, 0, 0, 2, 8, 0,
-    //  0, 0, 0, 4, 1, 9, 0, 0, 5,
-    //  0, 0, 0, 0, 8, 0, 0, 7, 9
-    //];
-
-    //const p = [
-    //  7, 8, 9, 1, 2, 3, 4 ,5, 6,
-    //  3, 0, 0, 0, 4, 0, 0, 0, 8,
-    //  5, 0, 0, 0, 9, 0, 0, 0, 1,
-    //  8, 0, 0, 0, 3, 0, 0, 0, 4,
-    //  1, 2, 3, 4, 5, 6, 7, 8, 9,
-    //  6, 0, 0, 0, 7, 0, 0, 0, 2,
-    //  9, 0, 0, 0, 1, 0, 0, 0, 5,
-    //  2, 0, 0, 0, 6, 0, 0, 0, 7,
-    //  4, 5, 6, 7, 8, 9, 1, 2, 3
-    //];
-
-    //const p = [
-    //  6, 0, 0, 0, 0, 0, 0, 0, 3,
-    //  0, 0, 1, 0, 9, 0, 6, 0, 0,
-    //  0, 5, 8, 0, 7, 0, 2, 4, 0,
-    //  0, 0, 0, 7, 0, 1, 0, 0, 0,
-    //  0, 8, 6, 0, 0, 0, 5, 7, 0,
-    //  0, 0, 0, 6, 0, 9, 0, 0, 0,
-    //  0, 6, 4, 0, 1, 0, 8, 2, 0,
-    //  0, 0, 7, 0, 6, 0, 4, 0, 0,
-    //  8, 0, 0, 0, 0, 0, 0, 0, 6
-    //];
-
-    //const p = [
-    //  0, 0, 6, 3, 0, 0, 0, 0, 5,
-    //  0, 5, 0, 0, 4, 0, 0, 9, 0,
-    //  8, 0, 0, 0, 0, 9, 1, 0, 0,
-    //  3, 0, 0, 0, 0, 1, 4, 0, 0,
-    //  0, 6, 0, 0, 7, 0, 0, 2, 0,
-    //  0, 0, 7, 5, 0, 0, 0, 0, 8,
-    //  0, 0, 4, 9, 0, 0, 0, 0, 3,
-    //  0, 1, 0, 0, 3, 0, 0, 6, 0,
-    //  2, 0, 0, 0, 0, 8, 9, 0, 0
-    //];
-
-    //const p = [
-    //  0, 0, 0, 0, 0, 0, 0, 0, 0,
-    //  0, 0, 0, 0, 0, 3, 0, 8, 5,
-    //  0, 0, 1, 0, 2, 0, 0, 0, 0,
-    //  0, 0, 0, 5, 0, 7, 0, 0, 0,
-    //  0, 0, 4, 0, 0, 0, 1, 0, 0,
-    //  0, 9, 0, 0, 0, 0, 0, 0, 0,
-    //  5, 0, 0, 0, 0, 0, 0, 7, 3,
-    //  0, 0, 2, 0, 1, 0, 0, 0, 0,
-    //  0, 0, 0, 0, 4, 0, 0, 0, 9
-    //];
-
     // prettier-ignore
     const p = [
-7, 1, 0, 0, 0, 9, 0, 0, 6,
-0, 5, 0, 0, 0, 0, 2, 7, 0,
-0, 0, 2, 0, 7, 3, 0, 0, 1,
-0, 0, 0, 0, 2, 0, 1, 9, 0,
-0, 0, 9, 4, 0, 0, 7, 0, 3,
-4, 7, 0, 0, 0, 1, 6, 0, 0,
-0, 3, 0, 6, 0, 0, 0, 1, 0,
-6, 0, 0, 0, 0, 0, 0, 8, 2,
-2, 0, 7, 1, 8, 0, 0, 0, 0,
+0, 0, 0, 0, 7, 0, 0, 2, 0,
+1, 9, 8, 4, 0, 2, 0, 0, 0,
+0, 0, 0, 3, 6, 0, 8, 9, 0,
+0, 8, 0, 0, 0, 7, 4, 6, 0,
+9, 0, 0, 0, 0, 0, 0, 0, 7,
+0, 0, 0, 5, 0, 0, 0, 1, 0,
+8, 0, 9, 7, 0, 0, 2, 4, 0,
+6, 2, 0, 9, 0, 0, 7, 0, 1,
+4, 0, 1, 2, 8, 0, 6, 5, 9,
 ];
-
     return p;
   }
   /**
