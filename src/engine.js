@@ -26,7 +26,7 @@ class Engine {
       uniquePuzzle = true;
     }
 
-    this.consoleLogPuzzle(solvedPuzzle);
+    //this.consoleLogPuzzle(finalPuzzle);
     return finalPuzzle;
   }
 
@@ -167,10 +167,9 @@ class Engine {
     // Get the row and column index
     const rowIndex = Math.floor(i / 9) + 1;
     const colIndex = i % 9 + 1;
+
     // Using the above values, calculate the square index
-    const colO3 = Math.ceil(colIndex / 3);
-    const rowT3 = (Math.ceil(rowIndex / 3) - 1) * 3;
-    const squareIndex = rowT3 + colO3;
+    const squareIndex = this.getSquareIndex(rowIndex, colIndex);
 
     // Filter the row, column and 3x3 square from our puzzle array
     let rowValues = tempPuzzle.filter(this.isRow, rowIndex);
@@ -192,17 +191,17 @@ class Engine {
     return true;
   }
 
+  // Start of our filter functions
   removeZero(element) {
     return element !== 0;
   }
-
   isRow(element, index) {
     return Math.floor(index / 9) + 1 == this;
   }
-
   isCol(element, index) {
     return index % 9 + 1 == this;
   }
+  // End of our filter function
 
   getSquare(i, puzzleArray) {
     const x = this.getStartingCol(i);
@@ -264,6 +263,14 @@ class Engine {
     for (let i = 0; i < unit.length; i++)
       if (unit[i] === unit[i + 1]) return true;
     return false;
+  }
+
+  getSquareIndex(row, col) {
+    const tempRow = (Math.ceil(row / 3) - 1) * 3;
+    const tempCol = Math.ceil(col / 3);
+    const square = tempRow + tempCol;
+
+    return square;
   }
 }
 

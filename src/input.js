@@ -75,11 +75,13 @@ class Input {
   checkValid(el) {
     let tempRow, tempCol;
     let tempEl, rowEl, colEl;
-    const square = this.sudoku.getSquareIndex(el.parentElement.classList.value);
 
-    // Check rows/cols if valid and apply/remove .error classes
     const row = /row(\d)/.exec(el.parentElement.classList);
     const col = /col(\d)/.exec(el.parentElement.classList);
+
+    const square = this.sudoku.engine.getSquareIndex(row[1], col[1]);
+
+    // Check rows/cols if valid and apply/remove .error classes
     for (let i = 1; i <= 9; i++) {
       rowEl = document.getElementsByClassName(`${row[0]} col${i}`)[0];
       colEl = document.getElementsByClassName(`row${i} ${col[0]}`)[0];

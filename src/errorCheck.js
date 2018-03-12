@@ -8,28 +8,6 @@ class Error {
 
   /**
    *
-   * @description Check row, col and 3x3 square for given tile
-   * @returns {undefined}
-   */
-  isValidStar(classList) {
-    let isValid = true;
-
-    const row = /row(\d)/.exec(classList);
-    const col = /col(\d)/.exec(classList);
-    const square = this.sudoku.getSquareIndex(classList);
-
-    if (
-      !this.isRowValid('.' + row[0]) ||
-      !this.isRowValid('.' + col[0]) ||
-      !this.isSquareValid(square)
-    )
-      isValid = false;
-
-    return isValid;
-  }
-
-  /**
-   *
    * @description Check if a row is valid for given tile class
    * @returns {undefined}
    */
@@ -124,12 +102,29 @@ class Error {
   isTileProblem(classList, value) {
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
-    const square = this.sudoku.getSquareIndex(classList);
+    const square = this.sudoku.engine.getSquareIndex(row[1], col[1]);
 
     return (
       this.isBoxProblemRow(`.${row[0]}`, value) ||
       this.isBoxProblemRow(`.${col[0]}`, value) ||
       this.isBoxProblemSquare(square, value)
+    );
+  }
+
+  /**
+   *
+   * @description Check row, col and 3x3 square for given tile
+   * @returns {undefined}
+   */
+  isValidStar(classList) {
+    const row = /row(\d)/.exec(classList);
+    const col = /col(\d)/.exec(classList);
+    const square = this.sudoku.engine.getSquareIndex(row[1], col[1]);
+
+    return !(
+      !this.isRowValid(`.${row[0]}`) ||
+      !this.isRowValid(`.${col[0]}`) ||
+      !this.isSquareValid(square)
     );
   }
 

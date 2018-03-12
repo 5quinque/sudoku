@@ -14,7 +14,6 @@ class Solver {
 
     // Clear any user inputted values
     this.clearAhead(1);
-    //console.clear();
 
     for (let i = 0; i < 80; i++) {
       // Skip over 'default' boxes
@@ -27,31 +26,30 @@ class Solver {
         continue;
       }
 
-      await this.func2(i);
-      //this.moveForward = this.elSol(this.boxes[i]);
+      await this.slowSolve(i);
+      //this.moveForward = this.incrementTile(this.boxes[i]);
 
+      // If we're not moving forward we're moving back
       if (!this.moveForward) {
-        // Move back two spaces
         i -= 2;
         this.clearAhead(i + 2);
       }
     }
   }
 
-  func2(i, x) {
+  // It looks pretty
+  slowSolve(i, x) {
     let self = this;
     return new Promise(resolve =>
       setTimeout(function() {
-        self.moveForward = self.elSol(self.boxes[i]);
+        self.moveForward = self.incrementTile(self.boxes[i]);
 
         resolve();
       }, 0),
     );
   }
 
-  elSol(boxEl, x) {
-    //let boxEl = document.querySelector(".row"+i+".col"+j);
-
+  incrementTile(boxEl) {
     if (parseInt(boxEl.childNodes[0].value)) {
       boxEl.childNodes[0].value++;
       if (boxEl.childNodes[0].value > 9) {
@@ -62,10 +60,6 @@ class Solver {
       boxEl.childNodes[0].value = 1;
     }
 
-    // When making array backtrack
-    // /maybe/ insteadof ++ store array of values treied for each index
-    // and randomly use one of them
-    // will prob help with creating puzzle and finding unique solution
     while (
       !this.sudoku.error.isValidStar(boxEl.classList) &&
       boxEl.childNodes[0].value < 9
@@ -83,14 +77,7 @@ class Solver {
 
   clearAhead(i) {
     for (; i < 81; i++) {
-      //let col = i % 9 + 1;
-      //let row = Math.floor(i / 9) + 1;
-      //let boxEl = document.querySelector('.row' + row + '.col' + col);
       if (this.boxes[i].classList.contains('default')) continue;
-
-      //if (boxEl.classList.contains('default')) continue;
-
-      //boxEl.childNodes[0].value = '';
       this.boxes[i].childNodes[0].value = '';
     }
   }
