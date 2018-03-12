@@ -220,6 +220,12 @@ class Engine {
     return squareArray;
   }
 
+  /**
+   *
+   * @description Get the starting column of a given square
+   *  E.g, 1 = 1, 2 = 4, 3 =  7, 4 = 1
+   * @returns int x
+   */
   getStartingCol(i) {
     let x;
     switch (i % 3) {
@@ -236,6 +242,11 @@ class Engine {
     return x;
   }
 
+  /**
+   *
+   * @description Get the starting row of a given square
+   * @returns int y
+   */
   getStartingRow(i) {
     let y;
     if (i < 4) {

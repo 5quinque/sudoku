@@ -51,158 +51,94 @@ class Error {
   }
 
   isSquareValid(i) {
-    let x, y;
-    let isValid = true;
+    let el;
     let values = [];
 
     // Get starting col
-    x = this.sudoku.getStartingCol(i);
+    let x = this.sudoku.engine.getStartingCol(i) + 1;
     // Get starting row
-    y = this.sudoku.getStartingRow(i);
+    let y = this.sudoku.engine.getStartingRow(i) + 1;
 
     for (let i = x; i < x + 3; i++) {
       for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
+        el = document.querySelector(`.col${i}.row${j}`);
+
         if (!el.childNodes[0].value) continue;
-        if (values.includes(el.childNodes[0].value)) {
-          isValid = false;
-          break;
-        }
+        if (values.includes(el.childNodes[0].value)) return false;
+
         values.push(el.childNodes[0].value);
       }
     }
-    return isValid;
+    return true;
   }
 
-  isBoxProbemSquare(i, value) {
-    let x, y;
-    let isProblem = false;
+  isBoxProblemSquare(i, value) {
+    let el;
     let values = [];
 
     // Get starting col
-    x = this.sudoku.getStartingCol(i);
+    let x = this.sudoku.engine.getStartingCol(i) + 1;
     // Get starting row
-    y = this.sudoku.getStartingRow(i);
+    let y = this.sudoku.engine.getStartingRow(i) + 1;
 
     for (let i = x; i < x + 3; i++) {
       for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
+        el = document.querySelector('.col' + i + '.row' + j);
+
         if (!el.childNodes[0].value) continue;
-        if (values.includes(el.childNodes[0].value)) {
-          if (el.childNodes[0].value == value) {
-            isProblem = true;
-            break;
-          }
-        }
+        if (
+          values.includes(el.childNodes[0].value) &&
+          el.childNodes[0].value == value
+        )
+          return true;
+
         values.push(el.childNodes[0].value);
       }
     }
-    return isProblem;
+    return false;
   }
 
   isBoxProblemRow(elClass, value) {
-    let isProblem = false;
     let values = [];
     const matches = document.querySelectorAll(elClass);
 
     for (let el of matches) {
       if (!el.childNodes[0].value) continue;
-      if (values.includes(el.childNodes[0].value)) {
-        if (el.childNodes[0].value == value) {
-          isProblem = true;
-          break;
-        }
-      }
+      if (
+        values.includes(el.childNodes[0].value) &&
+        el.childNodes[0].value == value
+      )
+        return true;
+
       values.push(el.childNodes[0].value);
     }
 
-    return isProblem;
+    return false;
   }
 
   /**
    *
-   * @description Is the given box an incorrect invalid
+   * @description Does the given tile have a duplicate
    * @returns {undefined}
    */
-  isBoxProblem(classList, value) {
-    let isProblem = false;
-
+  isTileProblem(classList, value) {
     const row = /row(\d)/.exec(classList);
     const col = /col(\d)/.exec(classList);
     const square = this.sudoku.getSquareIndex(classList);
 
-    if (
-      this.isBoxProblemRow('.' + row[0], value) ||
-      this.isBoxProblemRow('.' + col[0], value) ||
-      this.isBoxProbemSquare(square, value)
-    )
-      isProblem = true;
-
-    return isProblem;
+    return (
+      this.isBoxProblemRow(`.${row[0]}`, value) ||
+      this.isBoxProblemRow(`.${col[0]}`, value) ||
+      this.isBoxProblemSquare(square, value)
+    );
   }
 
   applyErrorClass(element) {
-    if (this.isBoxProblem(element.classList, element.childNodes[0].value)) {
+    if (this.isTileProblem(element.classList, element.childNodes[0].value)) {
       element.classList.add('error');
     } else {
       element.classList.remove('error');
     }
-  }
-
-  /**
-   *
-   * @description Remove 'error' class from valid boxes on given line
-   * @returns {undefined}
-   */
-  clearLine(rc, x, val) {
-    const matches = document.querySelectorAll('.' + rc + x);
-
-    for (let el of matches) {
-      if (el.childNodes[0].value == val) {
-        // Check if removal is valid..
-        if (this.isValidStar(el.classList)) {
-          el.classList.remove('error');
-          //console.log("Valid square, removing error class", el.classList);
-        } else {
-          console.log('Still an error, not removing error class', el.classList);
-        }
-      }
-    }
-  }
-
-  /**
-   *
-   * @description Remove 'error' calss from valid boxes on given square
-   * @returns {undefined}
-   */
-  clearSquare(i, val) {
-    let x, y;
-
-    console.log('Clearing square');
-
-    // Get starting col
-    x = this.sudoku.getStartingCol(i);
-    // Get starting row
-    y = this.sudoku.getStartingRow(i);
-
-    for (let i = x; i < x + 3; i++) {
-      for (let j = y; j < y + 3; j++) {
-        let el = document.querySelector('.col' + i + '.row' + j);
-        if (el.childNodes[0].value == val && this.isValidStar(el.classList))
-          el.classList.remove('error');
-      }
-    }
-  }
-
-  /**
-   * [UNUSED]
-   * @description Remove 'error' class from all divs in the grid
-   * @returns {undefined}
-   */
-  clearErrors() {
-    const tiles = document.querySelectorAll('.ninexnine_wrapper > *');
-
-    for (let el of tiles) el.classList.remove('error');
   }
 }
 

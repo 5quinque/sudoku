@@ -5,7 +5,7 @@ class Input {
   constructor(sudoku) {
     this.sudoku = sudoku;
 
-    this.addInputListeners();
+    this.addButtonListeners();
   }
 
   addInputListeners() {
@@ -13,7 +13,6 @@ class Input {
     const inputs = document.querySelectorAll(
       '.ninexnine_wrapper > div > input',
     );
-    let buttonRunning = false;
 
     // Loop through all inputs adding event listeners
     for (let i = 0; i < inputs.length; i++) {
@@ -26,14 +25,39 @@ class Input {
         self.storeBoxValue(this);
       });
     }
+  }
+
+  deleteInputListeners() {
+    const self = this;
+    const inputs = document.querySelectorAll(
+      '.ninexnine_wrapper > div > input',
+    );
+
+    // Loop through all inputs adding event listeners
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].removeEventListener('input', function() {
+        // Everytime the value is updated check if it's valid
+        self.checkValid(this);
+      });
+      inputs[i].removeEventListener('focus', function() {
+        // Store the box value for comparison when it's updated
+        self.storeBoxValue(this);
+      });
+    }
+  }
+
+  addButtonListeners() {
+    const self = this;
+    let buttonRunning = false;
 
     // Add event listeners for buttons
     let solveEl = document.getElementsByClassName('btn-solve')[0];
     solveEl.addEventListener('click', function() {
       if (!buttonRunning) {
         buttonRunning = true;
-        self.sudoku.solver.solve();
-        buttonRunning = false;
+        self.sudoku.solver.solve().then(v => {
+          buttonRunning = false;
+        });
       }
     });
 
@@ -47,7 +71,7 @@ class Input {
     });
   }
 
-  //
+  // move to error.js?
   checkValid(el) {
     let tempRow, tempCol;
     let tempEl, rowEl, colEl;
@@ -64,8 +88,9 @@ class Input {
     }
 
     // Check if square is valid and apply/remove .error classes
-    const x = this.sudoku.getStartingCol(square);
-    const y = this.sudoku.getStartingRow(square);
+    const x = this.sudoku.engine.getStartingCol(square) + 1;
+    const y = this.sudoku.engine.getStartingRow(square) + 1;
+
     for (let i = x; i < x + 3; i++) {
       for (let j = y; j < y + 3; j++) {
         tempEl = document.getElementsByClassName(`row${j} col${i}`)[0];

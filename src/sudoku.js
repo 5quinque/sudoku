@@ -20,6 +20,8 @@ class Sudoku {
     this.input = new Input(this);
 
     this.drawGame();
+
+    this.input.addInputListeners();
   }
 
   drawGame() {
@@ -43,8 +45,7 @@ class Sudoku {
     for (let i = 1; i <= 9; i++) {
       // Columns
       for (let j = 1; j <= 9; j++) {
-        puzzleWrapper.innerHTML +=
-          '<div class="row' + i + ' col' + j + '"></div>';
+        puzzleWrapper.innerHTML += `<div class="row${i} col${j}"></div>`;
       }
     }
   }
@@ -72,7 +73,9 @@ class Sudoku {
     const puzzleWrapper = document.querySelector('.ninexnine_wrapper');
     puzzleWrapper.innerHTML = '';
 
+    this.input.deleteInputListeners();
     this.drawGame();
+    this.input.addInputListeners();
   }
 
   createPuzzle() {
@@ -202,45 +205,6 @@ class Sudoku {
 
   /**
    *
-   * @description Get the starting column of a given square
-   *  E.g, 1 = 1, 2 = 4, 3 =  7, 4 = 1
-   * @returns int x
-   */
-  getStartingCol(i) {
-    let x;
-    switch (i % 3) {
-      case 1:
-        x = 1;
-        break;
-      case 2:
-        x = 4;
-        break;
-      case 0:
-        x = 7;
-        break;
-    }
-    return x;
-  }
-
-  /**
-   *
-   * @description Get the starting row of a given square
-   * @returns int y
-   */
-  getStartingRow(i) {
-    let y;
-    if (i < 4) {
-      y = 1;
-    } else if (i < 7) {
-      y = 4;
-    } else {
-      y = 7;
-    }
-    return y;
-  }
-
-  /**
-   *
    *
    * @returns {undefined}
    */
@@ -331,17 +295,3 @@ class Sudoku {
 }
 
 export default Sudoku;
-
-//let checkel = document.getElementsByClassName("btn-check")[0];
-//checkel.addEventListener("click", check);
-//
-//function check() {
-//  sud.checkEverything();
-//}
-//
-//let clearel = document.getElementsByClassName("btn-clear")[0];
-//clearel.addEventListener("click", clear);
-//
-//function clear() {
-//  sud.clearErrors();
-//}

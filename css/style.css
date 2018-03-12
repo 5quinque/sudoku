@@ -1,9 +1,7 @@
-
 body {
   background-color: #F8EFBA;
   font-family: sans-serif;
 }
-
 .ninexnine_wrapper {
   display: grid;
   grid-gap: 1px;
@@ -16,16 +14,12 @@ body {
   margin: auto;
   margin-top: 70px;
 }
-
-
 div.ninexnine_wrapper div {
   border-radius: 2px;
   line-height: 40px;
   text-align: center;
   font-weight: 700;
-  //border: 1px solid #aaa69d;
 }
-
 div.ninexnine_wrapper div input {
   width: 34px;
   height: 34px;
@@ -38,111 +32,46 @@ div.ninexnine_wrapper div input {
   text-align: center;
   border: 0;
   box-shadow: 0;
-  
 }
-
 div.ninexnine_wrapper div:not(.default):not(.error) input {
   background-color: #f7f1e3;
 }
-
 .default, .default input {
   background-color: #d1ccc0;
 }
-
-
 .default input {
   color: inherit;
 }
-
 .default.error, .default.error input {
   background-color: #c72f2f;
   color: #fff;
 }
-
 .error, .error input {
   background-color: #ff5252;
   color: #fff;
 }
-
 div.ninexnine_wrapper div:not(.default):not(.error) {
   background-color: #f7f1e3;
   color: #2c2c54;
 }
-
 .row3:not(.error), .row6:not(.error) {
-  //margin-bottom: 5px;
-  //border-bottom: 1px solid #2c2c54 !important;
   box-shadow: inset 0px -2px 0px 0px #2c2c54;
 }
-.row4:not(.error), .row7:not(.error) {
-  //margin-bottom: 5px;
-  //border-top: 1px solid #2c2c54 !important;
-}
-
 .col3:not(.error), .col6:not(.error) {
-  //margin-right: 5px;
-  //border-right: 1px solid #2c2c54 !important;
   box-shadow: inset -2px 0px 0px 0px #2c2c54;
 }
-
 .row3.col3:not(.error), .row3.col6:not(.error), .row6.col3:not(.error), .row6.col6:not(.error) {
   box-shadow: inset -2px -2px 0px 0px #2c2c54;
 }
-
-
 .row3.error, .row6.error {
-  //margin-bottom: 5px;
-  //border-bottom: 1px solid #b33939 !important;
   box-shadow: inset 0px -2px 0px 0px #b33939;
 }
-.row4.error, .row7.error {
-  //margin-bottom: 5px;
-  //border-top: 1px solid #b33939 !important;
-}
-
 .col3.error, .col6.error {
-  //margin-right: 5px;
-  //border-right: 1px solid #b33939 !important;
   box-shadow: inset -2px 0px 0px 0px #b33939;
 }
-
 .row3.col3.error, .row3.col6.error, .row6.col3.error, .row6.col6.error {
   box-shadow: inset -2px -2px 0px 0px #b33939;
 }
-
-
-
-
-
-
-
-
-.col4, .col7 {
-  //margin-right: 5px;
-  //border-left: 1px solid #2c2c54 !important;
-}
-/*div.ninexnine_wrapper div:nth-child(3n) {
-  margin-right: 5px;
-}
-div.ninexnine_wrapper div:nth-child(n+19):nth-child(-n+27) {
-  margin-bottom: 5px;
-}
-div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
-  margin-bottom: 5px;
-}*/
-
-
-
-
-
-//div.ninexnine_wrapper div:nth-child(n+6)::after {
-//  color: red;
-//  content: " - B";
-//}
-
-
-
-
 .button_grp {
   display: grid;
   grid-template-columns: [col] auto [col] auto;
@@ -154,13 +83,11 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
   padding: 0 10px 10px;
   border-radius: 0 0 4px 4px;
 }
-
 .btn-new, .btn-solve {
   display: block;
   margin: 0px 0;
   padding: 10px;
   width: 100%;
-  
   font-weight: 700;
   font-size: 1.1em;
   color: #D6A2E8;
@@ -168,7 +95,6 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
   box-shadow: 0;
   border: 0;
   border-radius: 3px;
-
   cursor: pointer;
 }
 .btn-new:hover, .btn-solve:hover {
@@ -184,14 +110,3 @@ div.ninexnine_wrapper div:nth-child(n+46):nth-child(-n+54) {
 .item-b {
   grid-column: col 2 / span 1;
 }
-
-
-/*
- *
-
- .one{
-   background-image: -webkit-linear-gradient(45deg, #013A6B 50%, #004E95 50%);
-     height: 50px;
-       width: 50px;
-       }
-       */
